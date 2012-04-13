@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}AJKLT Django Site - Blog{% endblock title%}
+
+{% block content %}
+    {% if post_list %}
+        <ul>
+        {% for post in post_list %}
+            <li>{{ post }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No posts are available.</p>
+    {% endif %}
+{% endblock content %}

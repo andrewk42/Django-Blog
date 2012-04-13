@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+{% block head %}
+    <title>{% block title %}AJKLT Django Site{% endblock title %}</title>
+    <link rel="stylesheet" href="base.css" type="text/css" />
+{% endblock head %}
+</head>
+
+<body>
+    <header>
+    {% block header %}
+        <h1>{% block logo %}AJKLT Django Site{% endblock logo %}</h1>
+
+        <nav>
+        {% block nav %}
+            <ul>
+                <li>Home</li>
+                <li>Blog</li>
+            </ul>
+        {% endblock nav %}
+        </nav>
+    {% endblock header %}
+    </header>
+
+    <section>
+    {% block content %}{% endblock %}
+    </section>
+
+    <footer>
+    {% block footer %}
+        Copyright AJKLT
+    {% endblock footer %}
+    </footer>
+</body>
+</html>
