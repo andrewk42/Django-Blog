@@ -8,26 +8,25 @@
 </head>
 
 <body>
-    <header>
+    <header class="base_header">
     {% block header %}
         <h1>{% block logo %}AJKLT Django Site{% endblock logo %}</h1>
 
-        <nav>
+        <nav class="base_nav">
         {% block nav %}
-            <ul>
-                <li>Home</li>
-                <li>Blog</li>
-            </ul>
+            <table>
+                <tr><td><a href="/">Home</a></td><td><a href="{% url blog_home %}">Blog</a></td></tr>
+            </table>
         {% endblock nav %}
         </nav>
     {% endblock header %}
     </header>
 
-    <section>
+    <section class="base_content">
     {% block content %}{% endblock %}
     </section>
 
-    <footer>
+    <footer class="base_footer">
     {% block footer %}
         Copyright AJKLT
     {% endblock footer %}

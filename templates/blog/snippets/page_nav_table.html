@@ -1,0 +1,16 @@
+{# This snippet prints the blog post page navigation bar #}
+        <nav class="blog_nav" id="{{ nav_id }}">
+            <table>
+                <tr>
+                    <th>Page:</th>
+                    {% for dummy in page_range %}
+                        {# In templates, 'and' has higher precedence than 'or' #}
+                        {% if forloop.counter == 1 and not current_page or forloop.counter == current_page %}
+                            <td>{{ forloop.counter }}</td>
+                        {% else %}
+                            <td><a href="{% url blog_home_by_page forloop.counter %}">{{ forloop.counter }}</a></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </table>
+        </nav>

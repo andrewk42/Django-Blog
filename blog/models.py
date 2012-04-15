@@ -50,8 +50,11 @@ class Post(models.Model):
 # Comments that can be left behind by anyone.
 class Comment(models.Model):
     publish_date = models.DateTimeField(auto_now_add=True)
-    post = models.ForeignKey(Post, related_name='comments')
+    post = models.ForeignKey(Post, default=1, related_name='comments')
     author = models.CharField(max_length=30, default=generateCommentAuthor, help_text="Please enter your name.")
     homepage = models.URLField(blank=True, help_text="Please enter your homepage URL.", validators=[URLValidator])
-    ip_address = models.IPAddressField(validators=[validate_ipv4_address])
+    ip_address = models.IPAddressField(default="127.0.0.1", validators=[validate_ipv4_address])
     body = models.TextField(default=generateCommentBody, help_text="Please enter your comment.", validators=[MaxLengthValidator(1000)])
+
+    def __unicode__(self):
+        return "Comment by "+unicode(self.author)+unicode(self.publish_date.strftime(" (%m-%d-%Y_%H-%M-%S)"))

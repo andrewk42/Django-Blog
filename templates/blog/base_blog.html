@@ -1,15 +1,33 @@
 {% extends "base.html" %}
 
-{% block title %}AJKLT Django Site - Blog{% endblock title%}
+{% block title %}AJKLT Django Site - Blog{% endblock title %}
 
 {% block content %}
-    {% if post_list %}
-        <ul>
-        {% for post in post_list %}
-            <li>{{ post }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No posts are available.</p>
+    {% if current_page %}
+        {% include "blog/snippets/page_nav_table.html" with nav_id="blog_nav_top" %}
+    {% endif %}
+    {% for post in post_list %}
+        <article class="blog_postContainer" id="blog_latestPost{{ forloop.counter0 }}">
+            <h2>{{ post.title }}</h2>
+            <div class="blog_postDetail">Posted on {{ post.publish_date }} in {{ post.category }}.</div>
+            <hr />
+            <div class="blog_postBody">
+                {{ post.body }}
+            </div>
+            <div class="blog_postComments">
+                <div class="blog_commentSummary">Comments({{ post.comments.all|length }})</div>
+                {% for comment in post.comments.all %}
+                    <div class="blog_commentContainer" id="blog_comment{{ forloop.counter0 }}">
+                        <em>Comment #{{ forloop.counter0 }} by {{ comment.author }}</em>
+                        <p>{{ comment.body }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </article>
+    {% empty %}
+        <p>No posts have been published.</p>
+    {% endfor %}
+    {% if last_page > 0 %}
+        {% include "blog/snippets/page_nav_table.html" with nav_id="blog_nav_bottom" %}
     {% endif %}
 {% endblock content %}
