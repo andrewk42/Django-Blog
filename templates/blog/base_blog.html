@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url_extras %}
 
 {% block title %}AJKLT Django Site - Blog{% endblock title %}
 
@@ -9,7 +10,7 @@
     {% for post in post_list %}
         <article class="blog_postContainer" id="blog_latestPost{{ forloop.counter0 }}">
             <h2>{{ post.title }}</h2>
-            <div class="blog_postDetail">Posted on {{ post.publish_date }} in {{ post.category }}.</div>
+            <div class="blog_postDetail">Posted on {{ post.publish_date }} in <a href="{% geturl blog_home '' 'filter=post.category' %}">{{ post.category }}</a>.</div>
             <hr />
             <div class="blog_postBody">
                 {{ post.body }}

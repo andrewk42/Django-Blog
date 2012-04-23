@@ -1,11 +1,9 @@
 from django.conf.urls.defaults import patterns, url
+from blog.models import Category
 
 urlpatterns = patterns('blog.views',
     # Index page
     url(r'^$', 'index', name='blog_home'),
-
-    # Index with page number
-    url(r'^page/(?P<page_num>\d+)/$', 'index', name='blog_home_by_page'),
 
     # Specific post primary key reference
     url(r'^(?P<post_id>\d+)/$', 'getPost', name='blog_post_by_id'),

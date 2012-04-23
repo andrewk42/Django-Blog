@@ -1,4 +1,4 @@
-{# This snippet prints the blog post page navigation bar #}
+{% load url_extras %}
         <nav class="blog_nav" id="{{ nav_id }}">
             <table>
                 <tr>
@@ -8,7 +8,11 @@
                         {% if forloop.counter == 1 and not current_page or forloop.counter == current_page %}
                             <td>{{ forloop.counter }}</td>
                         {% else %}
-                            <td><a href="{% url blog_home_by_page forloop.counter %}">{{ forloop.counter }}</a></td>
+                            {% if filter_name %}
+                            <td><a href="{% geturl blog_home '' 'filter=filter_name page=forloop.counter' %}">{{ forloop.counter }}</a></td>
+                            {% else %}
+                            <td><a href="{% geturl blog_home '' 'page=forloop.counter' %}">{{ forloop.counter }}</a></td>
+                            {% endif %}
                         {% endif %}
                     {% endfor %}
                 </tr>

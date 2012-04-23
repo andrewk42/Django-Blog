@@ -5,7 +5,8 @@ from string import lower, replace
 
 # Categories for the Posts.
 class Category(models.Model):
-    name = models.CharField(max_length=30)
+    name_regex = (r"^[A-Za-z ]+$", "Enter a category with only letters or spaces")
+    name = models.CharField(max_length=30, unique=True, validators=[RegexValidator(regex=name_regex[0], message=name_regex[1])])
 
     class Meta:
         verbose_name_plural = "Categories"
