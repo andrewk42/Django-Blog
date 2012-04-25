@@ -9,6 +9,7 @@
 :tabnew blog/views.py
 :tabnew blog/templatetags/url_extras.py
 :tabnew templates/base.html
-:tabnew templates/blog/base_blog.html
+:tabnew templates/blog/index.html
 :tabnew templates/blog/snippets/page_nav_table.html
+:tabnew templates/blog/post_detail.html
 :tabnew README

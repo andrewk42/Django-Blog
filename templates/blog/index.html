@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load url_extras %}
 
-{% block title %}AJKLT Django Site - Blog{% endblock title %}
+{% block title %}AJKLT - Blog{% if filter_name %} :: {{ filter_name }}{% endif %}{% endblock title %}
+{% block logo %}AJKLT - Blog{% if filter_name %} - {{ filter_name }} Entries{% endif %}{% endblock logo %}
 
 {% block content %}
     {% if current_page %}
@@ -9,20 +10,14 @@
     {% endif %}
     {% for post in post_list %}
         <article class="blog_postContainer" id="blog_latestPost{{ forloop.counter0 }}">
-            <h2>{{ post.title }}</h2>
+            <h2><a href="{% url blog_post_by_name post.urlname %}">{{ post.title }}</a></h2>
             <div class="blog_postDetail">Posted on {{ post.publish_date }} in <a href="{% geturl blog_home '' 'filter=post.category' %}">{{ post.category }}</a>.</div>
             <hr />
             <div class="blog_postBody">
                 {{ post.body }}
             </div>
             <div class="blog_postComments">
-                <div class="blog_commentSummary">Comments({{ post.comments.all|length }})</div>
-                {% for comment in post.comments.all %}
-                    <div class="blog_commentContainer" id="blog_comment{{ forloop.counter0 }}">
-                        <em>Comment #{{ forloop.counter0 }} by {{ comment.author }}</em>
-                        <p>{{ comment.body }}</p>
-                    </div>
-                {% endfor %}
+                <a href="{% url blog_post_by_name post.urlname %}">Comments({{ post.comments.all|length }})</a>
             </div>
         </article>
     {% empty %}

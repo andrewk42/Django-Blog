@@ -1,7 +1,10 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
-from blog.models import Post, Category
+from django.template import RequestContext
+from blog.models import Post, Category, Comment, CommentForm
+from string import replace
+import re
 
 def compileUrl(urlname, get_dict=None):
     # First make sure the urlname is valid and set it to a return value
@@ -21,7 +24,7 @@ def compileUrl(urlname, get_dict=None):
 
 def index(request):
     # This is kind of a config variable
-    posts_per_page = 3
+    posts_per_page = 4
 
     # Extract GETs
     page_num = request.GET.get('page')
@@ -70,7 +73,7 @@ def index(request):
         # Show first page by default
         posts = master_list[:posts_per_page]
 
-    return render_to_response('blog/base_blog.html', {
+    return render_to_response('blog/index.html', {
         'post_list': posts,
         'current_page': page_num,
         'filter_name': filter_name,
@@ -78,10 +81,46 @@ def index(request):
         'page_range': page_range,
     })
 
-def getPost(request, post_id=None, post_url=None):
-    if post_id is not None and post_url is None:
-        return HttpResponse("Post with primary key %s." % post_id)
-    elif post_id is None and post_url is not None:
-        return HttpResponse("Post with urlname %s." % post_url)
-    else:
+def postDetail(request, post_url):
+    match = re.match(r'^([\w-]+)_([\d]{2})-([\d]{2})-([\d]{4})$', post_url)
+
+    if match is None:
         raise Http404
+
+    post_title = replace(match.group(1), '_', ' ')
+    post_pub_date = match.group(4)+'-'+match.group(2)+'-'+match.group(3)
+
+    post = Post.objects.get(publish_date=post_pub_date, title=post_title)
+
+    # If the form has been submitted
+    if request.method == 'POST':
+        # Create a form/new model entry from POST data
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.ip_address = request.META['REMOTE_ADDR']
+            comment.save()
+
+            # This avoids duplicate form submissions
+            return HttpResponseRedirect("")
+
+    # New, unbound form case
+    else:
+        # Override the default values in the model, which are really meant for testing
+        blank_comment = Comment(author='', body='')
+        form = CommentForm(instance=blank_comment)
+
+    # Create a form/existing model entry from a model ref
+    # i.e. for a published comment that is to be edited
+    # form = CommentForm(instance=Comment.objects.get)
+
+    # Create a form/existing model entry from a model ref, and POST data
+    # i.e. for a published comment that is being edited but is bound to data
+    # form = CommentForm(request.POST, instance=Comment.objects.get)
+
+    return render_to_response('blog/post_detail.html', {
+        'post': post,
+        'form': form,
+    }, context_instance=RequestContext(request))

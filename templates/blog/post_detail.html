@@ -1,0 +1,39 @@
+{% extends "blog/index.html" %}
+{% load url_extras %}
+
+{% block title %}AJKLT - Blog :: {{ post.title }}{% endblock title %}
+{% block logo %}AJKLT - Blog - {{ post.title }}{% endblock logo %}
+
+{% block content %}
+        {# TODO: {% if error %}<script>.scrollTo('#error');</script>{% endif %} #}
+        <article class="blog_postContainer">
+            <h2><a href="{% url blog_post_by_name post.urlname %}">{{ post.title }}</a></h2>
+            <div class="blog_postDetail">Posted on {{ post.publish_date }} in <a href="{% geturl blog_home '' 'filter=post.category' %}">{{ post.category }}</a>.</div>
+            <hr />
+            <div class="blog_postBody">
+                {{ post.body }}
+            </div>
+            <div class="blog_postComments">
+                <div class="blog_commentSummary">Comments({{ post.comments.all|length }})</div>
+                {% for comment in post.comments.all %}
+                    <div class="blog_commentContainer" id="blog_comment{{ forloop.counter0 }}">
+                        <em>Comment #{{ forloop.counter }} by {{ comment.author }}{% if comment.homepage %} ({{ comment.homepage }}){% endif %}</em>
+                        <p>{{ comment.body }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="blog_newComment">
+            <h3>New Comment</h3>
+            {% if error_message %}<a name="error"><strong>{{ error_message }}</strong></a>{% endif %}
+            <form action="{% url blog_post_by_name post.urlname %}" method="post">
+                <fieldset>
+                    {% csrf_token %}
+                    {{ form.as_ul }}
+                </fieldset>
+                <div class="blog_newCommentFooter">
+                    <input type="submit" value="Submit" />
+                </div>
+            </form>
+        </article>
+{% endblock content %}
