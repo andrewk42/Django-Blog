@@ -73,7 +73,7 @@ def index(request):
         # Show first page by default
         posts = master_list[:posts_per_page]
 
-    return render_to_response('blog/index.html', {
+    return render_to_response('blog/base_blog.html', {
         'post_list': posts,
         'current_page': page_num,
         'filter_name': filter_name,
