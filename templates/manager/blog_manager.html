@@ -1,0 +1,33 @@
+{% extends "manager/base_manager.html" %}
+{% load url_extras %}
+
+{% block title %}AJKLT - Blog Manager Panel{% endblock title %}
+{% block logo %}AJKLT - Blog Manager Panel{% endblock logo %}
+
+{% block content %}
+        <div class="manager_blogTopContainer">
+            <h2>General Statistics</h2>
+            <table border="1" class="manager_blogGeneralTable">
+                <tr><th>Item 1</th><th>Item 2</th><th>Item 3</th><th>Item 4</th></tr>
+                <tr><td>value</td><td>value</td><td>value</td><td>value</td></tr>
+            </table>
+        </div>
+        <div class="manager_blogAddPostContainer">
+            <h2>Add New Post</h2>
+            <form action="{% url manage_blog %}" method="post">
+                <fieldset>
+                    {% csrf_token %}
+                    {{ form.as_ul }}
+                </fieldset>
+                <div class="manager_blogAddPostFooter">
+                    <input type="submit" value="Submit" />
+                </div>
+            </form>
+        </div>
+        <div class="manager_blogPostContainer" id="table">
+            <h2>Post Statistics</h2>
+            <table border="1" class="manager_blogPostTable">
+                {% include "manager/snippets/post_stats_table.html" %}
+            </table>
+        </div>
+{% endblock content %}

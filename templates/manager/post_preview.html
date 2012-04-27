@@ -1,0 +1,25 @@
+{% extends "manager/blog_manager.html" %}
+{% load url_extras %}
+
+{% block title %}AJKLT - Preview Post :: #{{ post.id }}{% endblock title %}
+{% block logo %}AJKLT - Preview Post - #{{ post.id }}{% endblock logo %}
+
+{% block content %}
+        <article class="blog_postContainer">
+            <h2>{{ post.title }}</h2>
+            <div class="blog_postDetail">Posted on {% if post.publish_date == None %}{% now "F g, Y" %}{% else %}{{ post.publish_date }}{% endif %} in {{ post.category }}.</div>
+            <hr />
+            <div class="blog_postBody">
+                {{ post.body|linebreaks }}
+            </div>
+            <form action="{% url edit_post post.id %}" method="post">
+                {% csrf_token %}
+                <div hidden="hidden">
+                    <h2>Edit Further</h2>
+                    {{ form.as_ul }}
+                </div>
+                {% if post.publish_date == None %}<input type="submit" name="publish" value="Publish!" />{% endif %}
+                <input type="submit" name="save" value="Save{% if post.publish_date == None %} and Publish Later{% endif %}" />
+            </form>
+        </article>
+{% endblock content %}

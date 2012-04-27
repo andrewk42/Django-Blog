@@ -62,6 +62,11 @@ class Comment(models.Model):
     def __unicode__(self):
         return "Comment by "+unicode(self.author)+unicode(self.publish_date.strftime(" (%m-%d-%Y_%H-%M-%S)"))
 
+class PostForm(ModelForm):
+    class Meta:
+        model = Post
+        fields = ('category', 'title', 'body')
+
 class CommentForm(ModelForm):
     class Meta:
         model = Comment

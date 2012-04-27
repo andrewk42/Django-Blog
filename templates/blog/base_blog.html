@@ -14,7 +14,7 @@
             <div class="blog_postDetail">Posted on {{ post.publish_date }} in <a href="{% geturl blog_home '' 'filter=post.category' %}">{{ post.category }}</a>.</div>
             <hr />
             <div class="blog_postBody">
-                {{ post.body }}
+                {{ post.body|linebreaks }}
             </div>
             <div class="blog_postComments">
                 <a href="{% url blog_post_by_name post.urlname %}">Comments({{ post.comments.all|length }})</a>
