@@ -17,3 +17,6 @@
 :tabnew templates/blog/post_detail.html
 :tabnew templates/manager/base_manager.html
 :tabnew templates/manager/blog_manager.html
+:tabnew templates/manager/snippets/post_stats_table.html
+:tabnew templates/manager/post_manager.html
+:tabnew templates/manager/post_preview.html
