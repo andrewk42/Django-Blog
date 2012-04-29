@@ -12,18 +12,7 @@
                 <tr><td>value</td><td>value</td><td>value</td><td>value</td></tr>
             </table>
         </div>
-        <div class="manager_blogAddPostContainer">
-            <h2>Add New Post</h2>
-            <form action="{% url manage_blog %}" method="post">
-                <fieldset>
-                    {% csrf_token %}
-                    {{ form.as_ul }}
-                </fieldset>
-                <div class="manager_blogAddPostFooter">
-                    <input type="submit" value="Submit" />
-                </div>
-            </form>
-        </div>
+        {% include "blog/snippets/new_post_form.html" %}
         <div class="manager_blogPostContainer" id="table">
             <h2>Post Statistics</h2>
             <table border="1" class="manager_blogPostTable">

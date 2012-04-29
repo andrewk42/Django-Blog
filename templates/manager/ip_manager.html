@@ -1,0 +1,28 @@
+{% extends "manager/post_manager.html" %}
+{% load url_extras %}
+
+{% block title %}AJKLT - Manage IP Address :: {{ ip_address }}{% endblock title %}
+{% block logo %}AJKLT - Manage IP Address - {{ ip_address }}{% endblock logo %}
+
+{% block content %}
+        <a href="{% url manage_blog %}">&lt&lt&lt Back</a>
+        {% if comments %}
+        <article class="blog_postComments" id="blog_postComments">
+            <h2>Manage Comments</h2>
+            <form action="{% url manage_ip url_ip_address %}" method="post">
+                {% csrf_token %}
+                {% for comment in comments %}
+                <fieldset>
+                    <div class="blog_{% if not comment.published %}hidden{% endif %}commentContainer" id="blog_comment{{ comment.id }}">
+                        <em>Comment #{{ comment.id }} {% if not comment.published %}(hidden) {% endif %}by {{ comment.author }}{% if comment.homepage %} ({{ comment.homepage }}){% endif %} on <a href="{% url edit_post comment.post.id %}">{{ comment.post.title }}</a></em>
+                        <label for="{{ comment.id }}_published">Published:</label><input type="checkbox" {% if comment.published %}checked="checked" {% endif %}name="{{ comment.id }}_published" id="{{ comment.id }}_published" />
+                        <p>{{ comment.body }}</p>
+                    </div>
+                    <a href="{% url edit_comment comment.id %}">Edit Comment</a>
+                </fieldset>
+                {% endfor %}
+                <input type="submit" value="Save published status" />
+            </form>
+        </article>
+        {% endif %}
+{% endblock content %}

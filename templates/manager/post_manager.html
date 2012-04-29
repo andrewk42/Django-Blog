@@ -6,24 +6,21 @@
 
 {% block content %}
         <a href="{% url manage_blog %}">&lt&lt&lt Back</a>
-        <article class="blog_postContainer">
-            <form action="{% url edit_post post.id %}" method="post">
-                {% csrf_token %}
-                {{ form.title.errors }}
-                {{ form.title.label_tag }}: {{ form.title }}
-                <div class="blog_postDetail">
-                    <div class="blog_postDates">Created: {{ post.create_date }} | Last Modified: {{ post.modified_date }} | Published: {{ post.publish_date|default_if_none:"Not published yet!" }}</div>
-                    <div class="blog_postCat">{{ form.category.errors }}
-                        {{ form.category.label_tag }}: {{ form.category }}
-                    </div>
+
+        {% include "blog/snippets/edit_post_form.html" %}
+
+        {% if post.comments.all|length > 0 %}
+        <article class="blog_postComments" id="blog_postComments">
+            <h2>Manage Comments</h2>
+            {% for comment in post.comments.all %}
+            <fieldset>
+                <div class="blog_{% if not comment.published %}hidden{% endif %}commentContainer" id="blog_comment{{ comment.id }}">
+                    <em>Comment #{{ comment.id }} {% if not comment.published %}(hidden) {% endif %}by {{ comment.author }}{% if comment.homepage %} ({{ comment.homepage }}){% endif %} from <a href="{% url manage_ip comment.ipUrlname %}">{{ comment.ip_address }}</a></em>
+                    <p>{{ comment.body }}</p>
                 </div>
-                <hr />
-                <div class="blog_postBody">
-                    {{ form.body.errors }}
-                    {{ form.body.label_tag }}: {{ form.body }}
-                </div>
-                <input type="submit" name="preview" value="Preview{% if post.publish_date == None %} then Publish{% endif %}" />
-                <input type="submit" name="save" value="Save{% if post.publish_date == None %} and Publish Later{% endif %}" />
-            </form>
+                <a href="{% url edit_comment comment.id %}">Edit Comment</a>
+            </fieldset>
+            {% endfor %}
         </article>
+        {% endif %}
 {% endblock content %}

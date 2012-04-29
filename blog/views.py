@@ -2,7 +2,8 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from blog.models import Post, Category, Comment, CommentForm
+from blog.models import Post, Category, Comment
+from blog.forms import CommentForm, formhandlerNewComment
 from string import replace
 import re
 
@@ -73,8 +74,14 @@ def index(request):
         # Show first page by default
         posts = master_list[:posts_per_page]
 
+    data = []
+
+    # Assemble the posts/comments in a weird way so that both lists can be iterated over in one template for loop
+    for post in posts:
+        data.append([post, Comment.objects.filter(post=post, published=True)])
+
     return render_to_response('blog/base_blog.html', {
-        'post_list': posts,
+        'post_list': data,
         'current_page': page_num,
         'filter_name': filter_name,
         'last_page': page_count,
@@ -91,26 +98,13 @@ def postDetail(request, post_url):
     post_pub_date = match.group(4)+'-'+match.group(2)+'-'+match.group(3)
 
     post = Post.objects.get(publish_date=post_pub_date, title=post_title)
+    comments = Comment.objects.filter(post=post, published=True)
 
-    # If the form has been submitted
-    if request.method == 'POST':
-        # Create a form/new model entry from POST data
-        form = CommentForm(request.POST)
+    form = formhandlerNewComment(request, post)
 
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.ip_address = request.META['REMOTE_ADDR']
-            comment.save()
-
-            # This avoids duplicate form submissions
-            return HttpResponseRedirect("")
-
-    # New, unbound form case
-    else:
-        # Override the default values in the model, which are really meant for testing
-        blank_comment = Comment(author='', body='')
-        form = CommentForm(instance=blank_comment)
+    if form.is_valid():
+        # This avoids duplicate form submissions
+        return HttpResponseRedirect("")
 
     # Create a form/existing model entry from a model ref
     # i.e. for a published comment that is to be edited
@@ -123,4 +117,5 @@ def postDetail(request, post_url):
     return render_to_response('blog/post_detail.html', {
         'post': post,
         'form': form,
+        'comments': comments,
     }, context_instance=RequestContext(request))

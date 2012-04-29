@@ -14,7 +14,7 @@
             </div>
             <form action="{% url edit_post post.id %}" method="post">
                 {% csrf_token %}
-                <div hidden="hidden">
+                <div id="hidden" hidden="hidden">
                     <h2>Edit Further</h2>
                     {{ form.as_ul }}
                 </div>

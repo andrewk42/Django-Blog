@@ -3,6 +3,7 @@
 :e settings.py
 :tabnew urls.py
 :tabnew blog/models.py
+:tabnew blog/forms.py
 :tabnew blog/generators.py
 :tabnew blog/admin.py
 :tabnew blog/urls.py
@@ -15,8 +16,14 @@
 :tabnew templates/blog/base_blog.html
 :tabnew templates/blog/snippets/page_nav_table.html
 :tabnew templates/blog/post_detail.html
+:tabnew templates/blog/snippets/new_comment_form.html
 :tabnew templates/manager/base_manager.html
 :tabnew templates/manager/blog_manager.html
 :tabnew templates/manager/snippets/post_stats_table.html
+:tabnew templates/blog/snippets/new_post_form.html
 :tabnew templates/manager/post_manager.html
+:tabnew templates/blog/snippets/edit_post_form.html
 :tabnew templates/manager/post_preview.html
+:tabnew templates/manager/comment_manager.html
+:tabnew templates/blog/snippets/edit_comment_form.html
+:tabnew templates/manager/ip_manager.html

@@ -1,0 +1,10 @@
+{% extends "manager/post_manager.html" %}
+{% load url_extras %}
+
+{% block title %}AJKLT - Manage Comment :: #{{ comment.id }}{% endblock title %}
+{% block logo %}AJKLT - Manage Comment - #{{ comment.id }}{% endblock logo %}
+
+{% block content %}
+        <a href="{% url edit_post comment.post.id %}">&lt&lt&lt Back to Post</a>
+        {% include "blog/snippets/edit_comment_form.html" %}
+{% endblock content %}

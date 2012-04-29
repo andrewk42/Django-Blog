@@ -1,0 +1,13 @@
+{# Template for an Edit Comment CommentForm #}
+        <article class="blog_editComment" id="blog_editComment">
+            <h3>Edit Comment</h3>
+            <form action="{% url edit_comment comment.id %}" method="post">
+                <fieldset>
+                    {% csrf_token %}
+                    {{ form.as_ul }}
+                </fieldset>
+                <div class="blog_commentFooter">
+                    <input type="submit" value="Save" />
+                </div>
+            </form>
+        </article>

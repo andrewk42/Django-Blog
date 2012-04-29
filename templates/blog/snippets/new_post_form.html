@@ -1,0 +1,13 @@
+{# Template for an Add Post PostForm #}
+        <div class="manager_blogAddPostContainer">
+            <h2>Add New Post</h2>
+            <form action="{% url manage_blog %}" method="post">
+                <fieldset>
+                    {% csrf_token %}
+                    {{ form.as_ul }}
+                </fieldset>
+                <div class="manager_blogAddPostFooter">
+                    <input type="submit" value="Submit" />
+                </div>
+            </form>
+        </div>

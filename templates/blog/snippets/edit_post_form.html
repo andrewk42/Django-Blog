@@ -1,0 +1,22 @@
+{# Template for an Edit Post PostForm #}
+        <article class="blog_postContainer">
+            <form action="{% url edit_post post.id %}" method="post">
+                {% csrf_token %}
+                {{ form.title.errors }}
+                {{ form.title.label_tag }}: {{ form.title }}
+                <div class="blog_postDetail">
+                    <div class="blog_postDates">Created: {{ post.create_date }} | Last Modified: {{ post.modified_date }} | Published: {{ post.publish_date|default_if_none:"Not published yet!" }}</div>
+                    <div class="blog_postCat">{{ form.category.errors }}
+                        {{ form.category.label_tag }}: {{ form.category }}
+                    </div>
+                </div>
+                <hr />
+                <div class="blog_postBody">
+                    {{ form.body.errors }}
+                    {{ form.body.label_tag }}: {{ form.body }}
+                </div>
+                <input type="submit" name="preview" value="Preview{% if post.publish_date == None %} then Publish{% endif %}" />
+                <input type="submit" name="save" value="Save{% if post.publish_date == None %} and Publish Later{% endif %}" />
+                {% if post.publish_date != None %}<input type="submit" name="close" value="Save and Close Post" />{% endif %}
+            </form>
+        </article>

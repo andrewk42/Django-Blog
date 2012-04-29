@@ -3,11 +3,12 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.db.models import Count
-from blog.models import Post, PostForm
+from blog.models import Post, Comment
+from blog.forms import PostForm, formhandlerPost, CommentForm, formhandlerExistingComment
 from blog.views import compileUrl
-from string import capitalize
+from string import capitalize, replace
 from collections import OrderedDict
-from datetime import date
+from copy import copy
 
 def index(request):
     return render_to_response('manager/base_manager.html')
@@ -104,42 +105,6 @@ def blogHome(request):
         'key': sort_key,
     }, context_instance=RequestContext(request))
 
-def handlePostForm(request, form):
-    recognized_keys = ['preview', 'save', 'publish']
-
-    # Assume first recognized key (there should only be 1 at a time)
-    for key in recognized_keys:
-        if key in request.POST:
-            break
-    # If none recnognized, how did we get here?
-    else:
-        raise Http404
-
-    # If we're previewing, don't save anything but show the submitted data in the preview template
-    if key == 'preview':
-        # Make a temporary version of the post
-        post = form.save(commit=False)
-
-        return render_to_response('manager/post_preview.html', {
-            'post': post,
-            'form': form,
-        }, context_instance=RequestContext(request))
-
-    # If we're just saving, save the valid data and reload the page with an unbound form
-    elif key == 'save':
-        form.save()
-        return HttpResponseRedirect(reverse('manage_blog'))
-
-    # Otherwise we're publishing
-    else:
-        post = form.save(commit=False)
-
-        if post.publish_date is None:
-            post.publish_date = date.today()
-            post.save()
-
-        return HttpResponseRedirect(reverse('manage_blog'))
-
 def editPost(request, post_id):
 
     # Get the referenced post, assume it is valid since this is from the manager panel
@@ -152,7 +117,7 @@ def editPost(request, post_id):
 
         # If the form is valid, decide which page this is from/appropriate action
         if form.is_valid():
-            return handlePostForm(request, form)
+            return formhandlerPost(request, form)
 
         # If form isn't valid, fall through
 
@@ -164,4 +129,42 @@ def editPost(request, post_id):
     return render_to_response('manager/post_manager.html', {
         'post': post,
         'form': form,
+    }, context_instance=RequestContext(request))
+
+def editComment(request, comment_id):
+
+    comment = Comment.objects.get(id=comment_id)
+
+    form = formhandlerExistingComment(request, comment)
+
+    if form.is_valid():
+        return HttpResponseRedirect(reverse('edit_post', args=[comment.post.id]))
+
+    return render_to_response('manager/comment_manager.html', {
+        'comment': comment,
+        'form': form,
+    }, context_instance=RequestContext(request))
+
+def manageIP(request, url_ip_address):
+    ip_address = replace(url_ip_address, '_', '.')
+
+    comments = Comment.objects.filter(ip_address=ip_address)
+
+    if request.method == 'POST':
+        # Check for each comment's published variable in the request
+        for comment in comments:
+            form_data = request.POST.get(str(comment.id)+'_published')
+
+            # If found, that comment was checked when the form was submitted
+            if form_data is not None:
+                comment.published = True
+            else:
+                comment.published = False
+
+            comment.save()
+
+    return render_to_response('manager/ip_manager.html', {
+        'ip_address': ip_address,
+        'url_ip_address': url_ip_address,
+        'comments': comments,
     }, context_instance=RequestContext(request))

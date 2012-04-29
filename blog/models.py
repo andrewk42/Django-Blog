@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.validators import RegexValidator, URLValidator, validate_ipv4_address, MaxLengthValidator
-from django.forms import ModelForm, TextInput, Textarea
 from blog.generators import generatePostTitle, generatePostBody, generateCommentAuthor, generateCommentBody
 from string import lower, replace
 
@@ -55,6 +54,7 @@ class Comment(models.Model):
     author = models.CharField(max_length=30, default=generateCommentAuthor, help_text="Please enter your name.")
     homepage = models.URLField(blank=True, help_text="Please enter your homepage URL.", validators=[URLValidator])
     ip_address = models.IPAddressField(default="127.0.0.1", validators=[validate_ipv4_address])
+    published = models.BooleanField(default=True, help_text="Comments not published can only be seen from the admin/manager pages")
     # Not a field, just for easy reference by both validator and form
     body_max = 3000
     body = models.TextField(default=generateCommentBody, help_text="Please enter your comment.", validators=[MaxLengthValidator(body_max)])
@@ -62,18 +62,6 @@ class Comment(models.Model):
     def __unicode__(self):
         return "Comment by "+unicode(self.author)+unicode(self.publish_date.strftime(" (%m-%d-%Y_%H-%M-%S)"))
 
-class PostForm(ModelForm):
-    class Meta:
-        model = Post
-        fields = ('category', 'title', 'body')
-
-class CommentForm(ModelForm):
-    class Meta:
-        model = Comment
-        exclude = ('publish_date', 'post', 'ip_address')
-        # These are included with several default attributes
-        widgets = {
-            'author': TextInput(attrs={'autocomplete': 'on'}),
-            'homepage': TextInput(attrs={'type': 'url', 'autocomplete': 'on'}), # There is a bug where 'type'='url' doesn't work
-            'body': Textarea(attrs={'maxlength': model.body_max, 'required': 'required'})
-        }
+    def ipUrlname(self):
+        ret = replace(str(self.ip_address), '.', '_')
+        return ret

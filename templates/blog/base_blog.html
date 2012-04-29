@@ -10,14 +10,14 @@
     {% endif %}
     {% for post in post_list %}
         <article class="blog_postContainer" id="blog_latestPost{{ forloop.counter0 }}">
-            <h2><a href="{% url blog_post_by_name post.urlname %}">{{ post.title }}</a></h2>
-            <div class="blog_postDetail">Posted on {{ post.publish_date }} in <a href="{% geturl blog_home '' 'filter=post.category' %}">{{ post.category }}</a>.</div>
+            <h2><a href="{% url blog_post_by_name post.0.urlname %}">{{ post.0.title }}</a></h2>
+            <div class="blog_postDetail">Posted on {{ post.0.publish_date }} in <a href="{% geturl blog_home '' 'filter=post.0.category' %}">{{ post.0.category }}</a>.</div>
             <hr />
             <div class="blog_postBody">
-                {{ post.body|linebreaks }}
+                {{ post.0.body|linebreaks }}
             </div>
             <div class="blog_postComments">
-                <a href="{% url blog_post_by_name post.urlname %}">Comments({{ post.comments.all|length }})</a>
+                <a href="{% url blog_post_by_name post.0.urlname %}">Comments({{ post.1|length }})</a>
             </div>
         </article>
     {% empty %}

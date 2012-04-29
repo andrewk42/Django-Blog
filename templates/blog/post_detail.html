@@ -14,25 +14,16 @@
                 {{ post.body }}
             </div>
             <div class="blog_postComments">
-                <div class="blog_commentSummary">Comments({{ post.comments.all|length }})</div>
-                {% for comment in post.comments.all %}
-                    <div class="blog_commentContainer" id="blog_comment{{ forloop.counter0 }}">
-                        <em>Comment #{{ forloop.counter }} by {{ comment.author }}{% if comment.homepage %} ({{ comment.homepage }}){% endif %}</em>
-                        <p>{{ comment.body }}</p>
-                    </div>
+                <div class="blog_commentSummary">Comments({{ comments|length }})</div>
+                {% for comment in comments %}
+                    <fieldset>
+                        <div class="blog_commentContainer" id="blog_comment{{ forloop.counter0 }}">
+                            <em>Comment #{{ forloop.counter }} by {{ comment.author }}{% if comment.homepage %} ({{ comment.homepage }}){% endif %}</em>
+                            <p>{{ comment.body }}</p>
+                        </div>
+                    </fieldset>
                 {% endfor %}
             </div>
         </article>
-        <article class="blog_newComment" id="blog_newComment">
-            <h3>New Comment</h3>
-            <form action="{% url blog_post_by_name post.urlname %}" method="post">
-                <fieldset>
-                    {% csrf_token %}
-                    {{ form.as_ul }}
-                </fieldset>
-                <div class="blog_newCommentFooter">
-                    <input type="submit" value="Submit" />
-                </div>
-            </form>
-        </article>
+        {% include "blog/snippets/new_comment_form.html" %}
 {% endblock content %}
