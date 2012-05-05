@@ -1,11 +1,15 @@
 {% load url_extras %}
+        <div class="manager_blogPostContainer" id="table">
+            <h2>Post Statistics</h2>
+            <table border="1" class="manager_blogPostTable">
                 <tr>
                 {% for field, data in field_data.items %}
                     <th><a href="{% geturl manage_blog '' 'sort=field by=data.0' %}#table">{{ data.1 }}</a>{% if field == key and data.0 == "asc" %} ▾{% endif %}{% if field == key and data.0 == "desc" %} ▴{% endif %}</th>
                 {% endfor %}
                     <th></th>
                 </tr>
-                {% for post in post_list %}
-                <tr><td>{{ post.id }}</td><td>{% if post.title|length > 30 %}{{ post.title|slice:":30" }}...{% else %}{{ post.title }}{% endif %}</td><td>{{ post.category }}</td><td>{{ post.create_date }}</td><td>{{ post.publish_date|default_if_none:"---" }}</td><td>{{ post.modified_date }}</td><td>{{ post.comments.all|length }}</td><td><a href="{% url edit_post post.id %}">Edit</a></tr>
-                {% endfor %}
-
+                {% if dir == 'asc' %}{% include "manager/snippets/post_stats_row.html" with post_list=post_list|dictsort:key %}
+                {% else %}{% if dir == 'desc' %}{% include "manager/snippets/post_stats_row.html" with post_list=post_list|dictsortreversed:key %}
+                {% else %}{% include "manager/snippets/post_stats_row.html" %}{% endif %}{% endif %}
+            </table>
+        </div>

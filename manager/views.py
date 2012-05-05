@@ -3,71 +3,23 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.db.models import Count
-from blog.models import Post, Comment
-from blog.forms import PostForm, formhandlerPost, CommentForm, formhandlerExistingComment
+from django.forms.models import model_to_dict
+from blog.models import Category, Post, Comment
+from blog.forms import *
 from blog.views import compileUrl
+from manager.models import Settings, Visit
+from manager.forms import SettingsForm, ValidSettings, formhandlerSettings
 from string import capitalize, replace
 from collections import OrderedDict
 from copy import copy
+from datetime import date
 
 def index(request):
     return render_to_response('manager/base_manager.html')
 
-def blogHome(request):
-    # Extract GETs
-    sort_key = request.GET.get('sort')
-    sort_dir = request.GET.get('by')
+def prepare_table_dict(sort_key, sort_dir):
 
-    # For maintaining valid GETs between page loads
-    get_dict = dict()
-    get_dict['sort'] = sort_key
-    get_dict['by'] = sort_dir
-
-    # Used for verifying GET values for re-ordering the Post stats table
-    post_fields = [f.name for f in Post._meta.fields]
-    post_fields.append('comments')
-    post_fields.remove('body')
-
-    # Verify sort_key, if it exists
-    if sort_key is not None and sort_key not in post_fields:
-        return HttpResponseRedirect(reverse('manage_blog'))
-
-    # Check for sort_dir, and if invalid refresh the page with the valid sort_key
-    if sort_dir == 'asc':
-        sort_char = ''
-    elif sort_dir is None or sort_dir == 'desc':
-        sort_char = '-'
-    else:
-        del get_dict['by']
-        return HttpResponseRedirect(compileUrl('manage_blog', get_dict))
-
-    # Always get all the posts, but order them depending on the state of the GET variables
-    if sort_key is None:
-        posts = Post.objects.all().order_by('-id')
-    elif sort_key == 'comments':
-        # Special case since 'comments' is a related field and not an actual field
-        posts = Post.objects.all().annotate(cmt_count=Count('comments')).order_by(sort_char+'cmt_count')
-    else:
-        posts = Post.objects.all().order_by(sort_char+sort_key)
-
-    # Form processing
-    if request.method == 'POST':
-        # Create a form/new model entry from POST data
-        form = PostForm(request.POST)
-
-        if form.is_valid():
-            m = form.save()
-
-            # This avoids duplicate form submissions
-            return HttpResponseRedirect(reverse('edit_post', args=[m.id]))
-
-    # New, unbound form case
-    else:
-        # Override the default values in the model, which are really meant for testing
-        blank_post = Post(title="", body="")
-        form = PostForm(instance=blank_post)
-
-    # Prepare table header values in this way to simplify template tags
+    # Prepare table header values in this way so we can loop in template tags
     field_dict = OrderedDict()
     field_dict['id'] = []
     field_dict['title'] = []
@@ -76,9 +28,10 @@ def blogHome(request):
     field_dict['publish_date'] = []
     field_dict['modified_date'] = []
     field_dict['comments'] = []
+    field_dict['hits'] = []
 
-    # More overcomplicated table ordering logic
-    for field in post_fields:
+    # Prepare values to be put in url of table headers relative to the current configuration
+    for field in field_dict:
         if field == 'create_date':
             name = "Date Created"
         elif field == 'modified_date':
@@ -98,11 +51,81 @@ def blogHome(request):
         else:
             field_dict[field] = ['desc', name]
 
+    return field_dict
+
+def blogHome(request):
+    # Extract GETs
+    sort_key = request.GET.get('sort')
+    sort_dir = request.GET.get('by')
+
+    # For maintaining valid GETs between page loads
+    get_dict = dict()
+    get_dict['sort'] = sort_key
+    get_dict['by'] = sort_dir
+
+    # Process Settings form, if it was submitted
+    try:
+        settings_form = formhandlerSettings(request)
+    except ValidSettings:
+        return HttpResponseRedirect("")
+
+    # PostForm processing
+    try:
+        post_form = formhandlerNewPost(request)
+    except ValidNewPost as e:
+        # This avoids duplicate form submissions
+        return HttpResponseRedirect(reverse('edit_post', args=[e.id]))
+
+    # General stats
+    gen_dict = dict()
+    gen_dict['totalcats'] = len(Category.objects.all())
+    gen_dict['totalposts'] = len(Post.objects.all())
+    gen_dict['totalcmts'] = len(Comment.objects.all())
+    gen_dict['totalhits'] = len(Visit.objects.all())
+
+    # Used for verifying GET values for re-ordering the Post stats table
+    post_fields = [f.name for f in Post._meta.fields]
+    post_fields.append('comments')
+    post_fields.append('hits')
+    post_fields.remove('body')
+
+    # Verify sort_key, if it exists
+    if sort_key is not None and sort_key not in post_fields:
+        return HttpResponseRedirect(reverse('manage_blog'))
+
+    # Check that sort_dir is valid
+    if sort_dir is not None and sort_dir != 'asc' and sort_dir != 'desc':
+        del get_dict['by']
+        return HttpResponseRedirect(compileUrl('manage_blog', get_dict))
+
+    # Always get all the posts, leave ordering to the template
+    posts = Post.objects.all().order_by('-id')
+
+    # Make a dict out of the retrieved model
+    post_list = [model_to_dict(post, exclude=['body']) for post in posts]
+
+    # Various dictionary fixups for use in templates
+    for count, dic in enumerate(post_list):
+        dic['category'] = posts[count].category.name
+        dic['create_date'] = posts[count].create_date
+        dic['modified_date'] = posts[count].modified_date
+        dic['comments'] = len(posts[count].comments.all())
+        dic['hits'] = len(Visit.objects.filter(path__startswith=compileUrl('blog_post_by_name', [posts[count].urlname()])))
+        if dic['publish_date'] is None:
+            dic['publish_date'] = date.min
+
+    # Prepare table headers
+    field_dict = prepare_table_dict(sort_key, sort_dir)
+
     return render_to_response('manager/blog_manager.html', {
-        'post_list': posts,
-        'form': form,
+        'post_list': post_list,
+        'post_form': post_form,
         'field_data': field_dict,
         'key': sort_key,
+        'dir': sort_dir,
+        'settings_form': settings_form,
+        'mindate': date.min,
+        'gen': gen_dict,
     }, context_instance=RequestContext(request))
 
 def editPost(request, post_id):
@@ -110,20 +133,18 @@ def editPost(request, post_id):
     # Get the referenced post, assume it is valid since this is from the manager panel
     post = Post.objects.get(id=post_id)
 
-    # Check if we got here by submitting the form
-    if request.method == 'POST':
-        # Create a form/existing model entry from a model ref, and POST data
-        form = PostForm(request.POST, instance=post)
-
-        # If the form is valid, decide which page this is from/appropriate action
-        if form.is_valid():
-            return formhandlerPost(request, form)
-
-        # If form isn't valid, fall through
-
-    # If here, we just came to the edit page without the form
-    else:
-        form = PostForm(instance=post)
+    # Do form processing
+    try:
+        form = formhandlerExistingPost(request, post)
+    except PreviewPost as e:
+        return render_to_response('manager/post_preview.html', {
+            'post': e.post,
+            'form': e.form,
+        }, context_instance=RequestContext(request))
+    except CloseExistingPost as e:
+        return HttpResponseRedirect(reverse('edit_post', args=[post.id]))
+    except ValidExistingPost:
+        return HttpResponseRedirect(reverse('manage_blog'))
 
     # We are either showing an unedited form or one that is bound to data, with errors
     return render_to_response('manager/post_manager.html', {
@@ -135,9 +156,9 @@ def editComment(request, comment_id):
 
     comment = Comment.objects.get(id=comment_id)
 
-    form = formhandlerExistingComment(request, comment)
-
-    if form.is_valid():
+    try:
+        form = formhandlerExistingComment(request, comment)
+    except ValidExistingComment:
         return HttpResponseRedirect(reverse('edit_post', args=[comment.post.id]))
 
     return render_to_response('manager/comment_manager.html', {
@@ -147,8 +168,15 @@ def editComment(request, comment_id):
 
 def manageIP(request, url_ip_address):
     ip_address = replace(url_ip_address, '_', '.')
+    detail_request = request.GET.get('details')
 
     comments = Comment.objects.filter(ip_address=ip_address)
+    hits = Visit.objects.filter(ip_address=ip_address).order_by('-time_stamp')
+
+    if detail_request:
+        visit_details = Visit.objects.get(id=detail_request)
+    else:
+        visit_details = False
 
     if request.method == 'POST':
         # Check for each comment's published variable in the request
@@ -167,4 +195,6 @@ def manageIP(request, url_ip_address):
         'ip_address': ip_address,
         'url_ip_address': url_ip_address,
         'comments': comments,
+        'hits': hits,
+        'visit_details': visit_details,
     }, context_instance=RequestContext(request))

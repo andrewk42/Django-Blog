@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import patterns, url
+from django.core.signals import request_started
 
 urlpatterns = patterns('blog.views',
     # Index page

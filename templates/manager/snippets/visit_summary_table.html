@@ -1,0 +1,10 @@
+{% load url_extras %}
+        <article class="manager_hitsContainer">
+            <h2>Site Visits</h2>
+            <table border="1" class="manager_ipAddressHitsTable">
+                <tr><th>Timestamp</th><th>Request Path</th><th>User Agent String</th><th>Referrer String</th><th>View Header and Body</th></tr>
+                {% for hit in hits %}
+                <tr><td>{{ hit.time_stamp }}</td><td>{{ hit.path }}</td><td>{% if hit.user_agent|length > 30 %}{{ hit.user_agent|slice:":30" }}...{% else %}{{ hit.user_agent }}{% endif %}</td><td>{% if hit.referrer|length > 30 %}{{ hit.referrer|slice:":30" }}...{% else %}{{ hit.referrer }}{% endif %}</td><td><a href="{% geturl manage_ip 'url_ip_address' 'details=hit.id' %}">View Details</a></td></tr>
+                {% endfor %}
+            </table>
+        </article>

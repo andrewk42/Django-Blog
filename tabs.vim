@@ -10,6 +10,8 @@
 :tabnew blog/views.py
 :tabnew blog/templatetags/url_extras.py
 :tabnew manager/models.py
+:tabnew manager/forms.py
+:tabnew manager/admin.py
 :tabnew manager/urls.py
 :tabnew manager/views.py
 :tabnew templates/base.html
@@ -20,6 +22,7 @@
 :tabnew templates/manager/base_manager.html
 :tabnew templates/manager/blog_manager.html
 :tabnew templates/manager/snippets/post_stats_table.html
+:tabnew templates/manager/snippets/post_stats_row.html
 :tabnew templates/blog/snippets/new_post_form.html
 :tabnew templates/manager/post_manager.html
 :tabnew templates/blog/snippets/edit_post_form.html

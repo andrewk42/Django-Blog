@@ -1,0 +1,4 @@
+                {% for post in post_list %}
+                <tr><td>{{ post.id }}</td><td>{% if post.title|length > 30 %}{{ post.title|slice:":30" }}...{% else %}{{ post.title }}{% endif %}</td><td>{{ post.category }}</td><td>{{ post.create_date }}</td><td>{% if post.publish_date == mindate %}---{% else %}{{ post.publish_date }}{% endif %}</td><td>{{ post.modified_date }}</td><td>{{ post.comments }}</td><td>{{ post.hits }}</td><td><a href="{% url edit_post post.id %}">Edit</a></tr>
+                {% endfor %}
+

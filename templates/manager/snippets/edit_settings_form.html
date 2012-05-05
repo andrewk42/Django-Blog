@@ -1,0 +1,13 @@
+{# Template for an Edit Settings SettingsForm #}
+        <div class="manager_settingsContainer">
+            <h2>Edit Settings</h2>
+            <form action="{% url manage_blog %}" method="post">
+                <fieldset>
+                    {% csrf_token %}
+                    {{ form.as_ul }}
+                </fieldset>
+                <div class="manager_settingsFooter">
+                    <input type="submit" value="Save Changes" />
+                </div>
+            </form>
+        </div>

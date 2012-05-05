@@ -25,4 +25,24 @@
             </form>
         </article>
         {% endif %}
+        {% if visit_details %}
+        <article class="manager_visitContainer">
+            <h2>Visit Details</h2>
+            <dl>
+                <dt>Timestamp:</dt>
+                    <dd>{{ visit_details.time_stamp }}</dd>
+                <dt>Request Path:</dt>
+                    <dd>{{ visit_details.path }}</dd>
+                <dt>User Agent String</dt>
+                    <dd>{{ visit_details.user_agent }}</dd>
+                <dt>Referrer</dt>
+                    <dd>{{ visit_details.referrer }}</dd>
+                <dt>Full Header</dt>
+                    <dd>{{ visit_details.full_header|linebreaks }}</dd>
+                <dt>Full Body</dt>
+                    <dd>{{ visit_details.full_body|linebreaks }}</dd>
+            </dl>
+        </article>
+        {% endif %}
+        {% include "manager/snippets/visit_summary_table.html" %}
 {% endblock content %}

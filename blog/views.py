@@ -3,13 +3,18 @@ from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from blog.models import Post, Category, Comment
-from blog.forms import CommentForm, formhandlerNewComment
+from blog.forms import CommentForm, ValidNewComment, formhandlerNewComment
+from manager.models import Settings
 from string import replace
 import re
 
-def compileUrl(urlname, get_dict=None):
-    # First make sure the urlname is valid and set it to a return value
-    ret = reverse(urlname)
+def compileUrl(urlname, url_vars=None, get_dict=None):
+    if url_vars is None:
+        # First make sure the urlname is valid and set it to a return value
+        ret = reverse(urlname)
+
+    else:
+        ret = reverse(urlname, args=url_vars)
 
     # Check if we have any GET variables to append to the return value
     if get_dict and len(get_dict) > 0:
@@ -24,8 +29,9 @@ def compileUrl(urlname, get_dict=None):
     return ret
 
 def index(request):
-    # This is kind of a config variable
-    posts_per_page = 4
+    # Get user settings
+    settings = Settings.objects.get_or_create(id=1)[0]
+    posts_per_page = settings.blog_posts_per_page
 
     # Extract GETs
     page_num = request.GET.get('page')
@@ -100,9 +106,9 @@ def postDetail(request, post_url):
     post = Post.objects.get(publish_date=post_pub_date, title=post_title)
     comments = Comment.objects.filter(post=post, published=True)
 
-    form = formhandlerNewComment(request, post)
-
-    if form.is_valid():
+    try:
+        form = formhandlerNewComment(request, post)
+    except ValidNewComment:
         # This avoids duplicate form submissions
         return HttpResponseRedirect("")
 

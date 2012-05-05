@@ -5,18 +5,14 @@
 {% block logo %}AJKLT - Blog Manager Panel{% endblock logo %}
 
 {% block content %}
+        {% include "manager/snippets/edit_settings_form.html" with form=settings_form %}
+        {% include "blog/snippets/new_post_form.html" with form=post_form%}
         <div class="manager_blogTopContainer">
             <h2>General Statistics</h2>
             <table border="1" class="manager_blogGeneralTable">
-                <tr><th>Item 1</th><th>Item 2</th><th>Item 3</th><th>Item 4</th></tr>
-                <tr><td>value</td><td>value</td><td>value</td><td>value</td></tr>
+                <tr><th>Total Categories</th><th>Total Posts</th><th>Total Comments</th><th>Total Hits</th></tr>
+                <tr><td>{{ gen.totalcats }}</td><td>{{ gen.totalposts }}</td><td>{{ gen.totalcmts }}</td><td>{{ gen.totalhits }}</td></tr>
             </table>
         </div>
-        {% include "blog/snippets/new_post_form.html" %}
-        <div class="manager_blogPostContainer" id="table">
-            <h2>Post Statistics</h2>
-            <table border="1" class="manager_blogPostTable">
-                {% include "manager/snippets/post_stats_table.html" %}
-            </table>
-        </div>
+        {% include "manager/snippets/post_stats_table.html" %}
 {% endblock content %}
