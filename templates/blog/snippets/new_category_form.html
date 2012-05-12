@@ -1,0 +1,13 @@
+{# Template for an Add Category CategoryForm #}
+        <div class="manager_blogAddCategoryContainer">
+            <h2>Add New Category</h2>
+            <form action="{% url manage_blog %}" method="post">
+                <fieldset>
+                    {% csrf_token %}
+                    {{ form.as_ul }}
+                </fieldset>
+                <div class="manager_blogAddCategoryFooter">
+                    <input type="submit" value="Submit" />
+                </div>
+            </form>
+        </div>

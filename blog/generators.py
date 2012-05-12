@@ -81,9 +81,8 @@ def generatePosts(amount=10):
         if random() > .2:
             p.publish_date = date.today()
 
-        p.save()
+        p.save(False)
         sleep(2)
-        
 
 def generateComments(amount=10, post_id=None):
     from djangoroot.blog.models import Category, Post, Comment
@@ -108,5 +107,5 @@ def generateComments(amount=10, post_id=None):
             p = Post.objects.get(id=randrange(1, post_range+1))
 
         c = Comment(post=p)
-        c.save()
+        c.save(False)
         sleep(2)

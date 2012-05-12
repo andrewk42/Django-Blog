@@ -6,17 +6,16 @@
 
 {% block content %}
         <a href="{% url manage_blog %}">&lt&lt&lt Back</a>
-
         {% include "blog/snippets/edit_post_form.html" %}
-
-        {% if post.comments.all|length > 0 %}
+        {% if rev != None %}{% include "manager/snippets/use_revision_form.html" with dest="edit_post" dest_args=post.id %}{% endif %}
+        {% if comments %}
         <article class="blog_postComments" id="blog_postComments">
             <h2>Manage Comments</h2>
-            {% for comment in post.comments.all %}
+            {% for comment in comments %}
             <fieldset>
                 <div class="blog_{% if not comment.published %}hidden{% endif %}commentContainer" id="blog_comment{{ comment.id }}">
                     <em>Comment #{{ comment.id }} {% if not comment.published %}(hidden) {% endif %}by {{ comment.author }}{% if comment.homepage %} ({{ comment.homepage }}){% endif %} from <a href="{% url manage_ip comment.ipUrlname %}">{{ comment.ip_address }}</a></em>
-                    <p>{{ comment.body }}</p>
+                    <p>{{ comment.body|linebreaks }}</p>
                 </div>
                 <a href="{% url edit_comment comment.id %}">Edit Comment</a>
             </fieldset>

@@ -3,8 +3,12 @@ from django.forms import ModelForm, TextInput, Textarea
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from blog.models import Post, Comment
+from blog.models import Category, Post, Comment
 from datetime import date
+
+class CategoryForm(ModelForm):
+    class Meta:
+        model = Category
 
 class PostForm(ModelForm):
     class Meta:
@@ -21,6 +25,10 @@ class CommentForm(ModelForm):
             'homepage': TextInput(attrs={'type': 'url', 'autocomplete': 'on'}), # There is a bug where 'type'='url' doesn't work
             'body': Textarea(attrs={'maxlength': model.body_max, 'required': 'required'})
         }
+
+class ValidCategory(Exception):
+    def __str__(self):
+        return "The processed CategoryForm is valid and has been saved"
 
 class ValidNewPost(Exception):
     def __init__(self, id):
@@ -52,6 +60,33 @@ class ValidNewComment(ValidExistingPost):
 class ValidExistingComment(ValidExistingPost):
     def __str__(self):
         return "The processed CommentForm is valid"
+
+def formhandlerNewCategory(request):
+    if request.method == 'POST':
+        cat_form = CategoryForm(request.POST)
+
+        if cat_form.is_valid():
+            cat_form.save()
+
+            raise ValidCategory()
+
+    else:
+        cat_form = CategoryForm()
+
+    return cat_form
+
+def formhandlerExistingCategory(request, category):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+
+        if form.is_valid():
+            form.save()
+            raise ValidCategory()
+
+    else:
+        form = CategoryForm(instance=category)
+
+    return form
 
 def formhandlerNewPost(request):
     if request.method == 'POST':
@@ -117,7 +152,7 @@ def formhandlerExistingPost(request, post):
                     post.publish_date = date.today()
                     post.save()
 
-                raise ValidExistingPost
+                raise ValidExistingPost()
 
         # If form isn't valid, fall through
 
@@ -138,7 +173,7 @@ def formhandlerNewComment(request, post):
             comment.post = post
             comment.ip_address = request.META['REMOTE_ADDR']
             comment.save()
-            raise ValidNewComment
+            raise ValidNewComment()
 
     # New, unbound form case
     else:
@@ -157,7 +192,7 @@ def formhandlerExistingComment(request, comment):
         if form.is_valid():
             comment = form.save(commit=False)
             comment.save()
-            raise ValidExistingComment
+            raise ValidExistingComment()
 
     # New, unbound form case
     else:

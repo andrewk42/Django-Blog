@@ -7,4 +7,5 @@
 {% block content %}
         <a href="{% url edit_post comment.post.id %}">&lt&lt&lt Back to Post</a>
         {% include "blog/snippets/edit_comment_form.html" %}
+        {% if rev != None %}{% include "manager/snippets/use_revision_form.html" with dest="edit_comment" dest_args=comment.id %}{% endif %}
 {% endblock content %}

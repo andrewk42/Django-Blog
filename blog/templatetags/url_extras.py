@@ -26,6 +26,14 @@ class GeturlNode(template.Node):
         self.url_args = url_args
         self.get_vars = get_vars
     def render(self, context):
+        # Check if the url name is a template variable
+        temp = template.Variable(self.url_name)
+        try:
+            name = temp.resolve(context)
+            self.url_name = name
+        except template.VariableDoesNotExist:
+            pass
+
         # Process the url arguments
         if len(self.url_args) > 0:
             # We have to check if each argument is a template variable.

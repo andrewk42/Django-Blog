@@ -1,0 +1,18 @@
+{% load url_extras %}
+        <article class="blog_postRevisions" id="blog_postRevisions">
+            <h2>Revisions</h2>
+            {% for revision in revisions %}
+            <ul>
+                <form action="{% geturl dest 'dest_args' 'diff=revision.id' %}" method="post">
+                    <li>Revision from {{ revision.create_date }} <a href="{% geturl dest 'dest_args' 'diff=revision.id' %}">Show Diff</a></li>
+                    {% if rev.id == revision.id %}
+                    {% csrf_token %}
+                    {% autoescape off %}{% for item in diff %}
+                    <p>{{ item }}</p>
+                    {% endfor %}{% endautoescape %}
+                    <input type="submit" value="Revert" name="revert"/>
+                    {% endif %}
+                </form>
+            </ul>
+            {% endfor %}
+        </article>

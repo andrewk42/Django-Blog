@@ -5,8 +5,13 @@
 {% block logo %}AJKLT - Blog Manager Panel{% endblock logo %}
 
 {% block content %}
+        {% if gen.totalposts > 0 %}
         {% include "manager/snippets/edit_settings_form.html" with form=settings_form %}
-        {% include "blog/snippets/new_post_form.html" with form=post_form%}
+        {% endif %}
+        {% include "blog/snippets/new_category_form.html" with form=cat_form %}
+        {% if gen.totalcats > 0 %}
+        {% include "blog/snippets/new_post_form.html" with form=post_form %}
+        {% endif %}
         <div class="manager_blogTopContainer">
             <h2>General Statistics</h2>
             <table border="1" class="manager_blogGeneralTable">
@@ -14,5 +19,15 @@
                 <tr><td>{{ gen.totalcats }}</td><td>{{ gen.totalposts }}</td><td>{{ gen.totalcmts }}</td><td>{{ gen.totalhits }}</td></tr>
             </table>
         </div>
+        <div class="manager_blogCategoryContainer">
+            <h2>Category Statistics</h2>
+            <table border="1" class="manager_blogCategoryTable">
+                <tr><th>Id</th><th>Name</th><th>Associated Posts</th><th></th>
+                {% for category in categories %}
+                    <tr><td>{{ category.id }}</td><td>{{ category.name }}</td><td>{{ category.posts.all|length }}</td><td><a href="{% url edit_category category.id %}">Edit</a></tr>
+                {% endfor %}
+            </table>
+        </div>
         {% include "manager/snippets/post_stats_table.html" %}
+        
 {% endblock content %}

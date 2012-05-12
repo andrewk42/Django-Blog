@@ -7,6 +7,9 @@ urlpatterns = patterns('manager.views',
     # Blog manager home
     url(r'^blog/$', 'blogHome', name='manage_blog'),
 
+    # Blog category edit page
+    url(r'^blog/category/(?P<cat_id>\d+)/$', 'editCategory', name='edit_category'),
+
     # Blog post edit page
     url(r'blog/post/(?P<post_id>\d+)/$', 'editPost', name='edit_post'),
 

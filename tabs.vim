@@ -21,12 +21,16 @@
 :tabnew templates/blog/snippets/new_comment_form.html
 :tabnew templates/manager/base_manager.html
 :tabnew templates/manager/blog_manager.html
+:tabnew templates/manager/snippets/edit_settings_form.html
+:tabnew templates/blog/snippets/new_category_form.html
+:tabnew templates/blog/snippets/new_post_form.html
 :tabnew templates/manager/snippets/post_stats_table.html
 :tabnew templates/manager/snippets/post_stats_row.html
-:tabnew templates/blog/snippets/new_post_form.html
 :tabnew templates/manager/post_manager.html
 :tabnew templates/blog/snippets/edit_post_form.html
 :tabnew templates/manager/post_preview.html
 :tabnew templates/manager/comment_manager.html
 :tabnew templates/blog/snippets/edit_comment_form.html
 :tabnew templates/manager/ip_manager.html
+:tabnew templates/manager/category_manager.html
+:tabnew templates/manager/snippets/use_revision_form.html

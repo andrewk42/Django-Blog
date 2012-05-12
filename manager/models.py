@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 last_hit_timestamp = datetime.now()
 
 class Settings(models.Model):
-    blog_posts_per_page = models.IntegerField(default=5, help_text="The number of posts shown on the main page", validators=[MaxValueValidator(10), MinValueValidator(2)])
+    blog_posts_per_page = models.IntegerField(default=3, help_text="The number of posts shown on the main page", validators=[MaxValueValidator(10), MinValueValidator(2)])
 
     class Meta:
         verbose_name_plural = "Settings"
